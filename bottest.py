@@ -4,13 +4,35 @@ import zulip
 import sys
 import re
 from random import choice
+import nltk
 
 # defining all punctuation marks to be removed from msg strings
-punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;:"
+punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;"
 
 # Keyword arguments 'email' and 'api_key' are not required if you are using ~/.zuliprc
 client = zulip.Client(email="punbot-bot@students.hackerschool.com",
                       api_key="FgrSqwnEu0MM3XyEpdwcpeINkC95cyw4")
+
+dictionary = nltk.corpus.cmudict.dict()
+
+def get_word_stress(word):
+    pronounce = dictionary.get(word.lower())
+    if pronounce:
+        pronounce = choice(pronounce)
+        phonemes = [letter for phoneme in pronounce for letter in phoneme]
+        results = [char for char in phonemes if char.isdigit()]
+        return results
+    else:
+        return None
+
+def valid_pun_word(word):
+    word_stress = get_word_stress(word)
+    if word_stress == None:
+        return True
+    elif len(word_stress) > 1 and word_stress[-1] == "0":
+        return True
+    else:
+        return False
 
 def respond(msg):
     if msg["sender_email"] != "punbot-bot@students.hackerschool.com":
@@ -37,9 +59,9 @@ def hardly_know_er(text):
     punable = []
     for word in text:
         m = re.search(".*(?=er$)",word)
-        if m:
+        if m and valid_pun_word(word):
             punable.append(m.group())
-
+    # TODO: add probability gen so it doesn't pun EVERY time, just some of the time
     print punable
     if len(punable) > 0:
         pun_word = choice(punable).title()

@@ -2,44 +2,53 @@
 
 import zulip
 import sys
+import re
+from random import choice
+
+# defining all punctuation marks to be removed from msg strings
+punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;:"
 
 # Keyword arguments 'email' and 'api_key' are not required if you are using ~/.zuliprc
 client = zulip.Client(email="punbot-bot@students.hackerschool.com",
                       api_key="FgrSqwnEu0MM3XyEpdwcpeINkC95cyw4")
 
-# Send a stream message
-# client.send_message({
-#     "type": "stream",
-#     "to": "Denmark",
-#     "subject": "Castle",
-#     "content": "Something is rotten in the state of Denmark."
-# })
-
-# Send a private message
-# client.send_message({
-#     "type": "private",
-#     "to": "maia.mcc@gmail.com",
-#     "content": "Did you hear the one about the three holes in the ground?"
-# })
-
 def respond(msg):
-    if (msg["type"] == "private") and (msg["sender_email"] != "punbot-bot@students.hackerschool.com"):
-        print "Punbot got a message from not-punbot!"
-        print msg
-        client.send_message({
-            "type": "private",
-            "to": msg["sender_email"],
-            "content": "You just sent me this message: " + msg["content"]
-        })
-    elif msg["type"] == "stream" and (msg["sender_email"] != "punbot-bot@students.hackerschool.com"):
-        print "Look, a stream message from not-punbot!"
-        print msg
-        client.send_message({
-            "type": "stream",
-            "subject": msg["subject"],
-            "to": msg['display_recipient'],
-            "content": "@**"+ msg["sender_full_name"] + "** just sent this message: " + msg["content"]
-        })
+    if msg["sender_email"] != "punbot-bot@students.hackerschool.com":
+        print msg["content"]
+        msg_content = str(msg["content"]).translate(None, punctuation).lower().split()
+        print msg_content
+        pun_msg = hardly_know_er(msg_content)
+        if pun_msg:
+            if msg["type"] == "private":
+                client.send_message({
+                    "type": "private",
+                    "to": msg["sender_email"],
+                    "content": pun_msg
+                })
+            elif msg["type"] == "stream":
+                client.send_message({
+                    "type": "stream",
+                    "subject": msg["subject"],
+                    "to": msg['display_recipient'],
+                    "content": pun_msg
+                })
+
+def hardly_know_er(text):
+    punable = []
+    for word in text:
+        m = re.search(".*(?=er$)",word)
+        if m:
+            punable.append(m.group())
+
+    print punable
+    if len(punable) > 0:
+        pun_word = choice(punable).title()
+        # TODO: if word isn't a valid word but word+e is, use word+e.
+            # otherwise, just use word.
+
+        return pun_word + " 'er? I hardly KNOW 'er!"
+    else:
+        return
 
 # Parse each message that the user receives
 # This is a blocking call that will run forever

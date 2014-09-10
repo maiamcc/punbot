@@ -23,22 +23,22 @@ def get_word_stress(word):
         results = [char for char in phonemes if char.isdigit()]
         return results
     else:
-        return None
+        return [0,0]
 
-def valid_pun_word(word):
-    word_stress = get_word_stress(word)
-    if word_stress == None:
+def valid_her_word(word):
+    pronounce = dictionary.get(word.lower())
+    if pronounce:
+        for pronunciation in pronounce:
+            if pronunciation[-1] == "ER0" and len(get_word_stress(word))>1:
+                return True
+        else:
+            return False
+    elif re.search(".*(?=er$)", word):
         return True
-    elif len(word_stress) > 1 and word_stress[-1] == "0":
-        return True
-    else:
-        return False
 
 def respond(msg):
     if msg["sender_email"] != "punbot-bot@students.hackerschool.com":
-        print msg["content"]
         msg_content = str(msg["content"]).translate(None, punctuation).lower().split()
-        print msg_content
         pun_msg = hardly_know_er(msg_content)
         if pun_msg:
             if msg["type"] == "private":
@@ -58,17 +58,27 @@ def respond(msg):
 def hardly_know_er(text):
     punable = []
     for word in text:
-        m = re.search(".*(?=er$)",word)
-        if m and valid_pun_word(word):
-            punable.append(m.group())
+        if valid_her_word(word):
+            punable.append(word)
     # TODO: add probability gen so it doesn't pun EVERY time, just some of the time
     print punable
     if len(punable) > 0:
-        pun_word = choice(punable).title()
-        # TODO: if word isn't a valid word but word+e is, use word+e.
-            # otherwise, just use word.
-
-        return pun_word + " 'er? I hardly KNOW 'er!"
+        pun_word = choice(punable)[:-2]
+        if pun_word[-1] == "i": # e.g. ferrier --> ferry 'er
+            print "your word ends in i"
+            if dictionary.get(pun_word[:-1]+"y"):
+                pun_word = pun_word[:-1]+"y"
+        elif not dictionary.get(pun_word): # e.g. stirrer --> stir 'er
+            print "your word maybe has too many letters"
+            if dictionary.get(pun_word[:-1]):
+                pun_word = pun_word[:-1]
+        elif word[-2] == "e": # e.g. parser --> parse 'er
+            print "your word maybe should end in e"
+            print "your word now is", pun_word
+            if dictionary.get(pun_word+"e"):
+                print "lets modify the thing"
+                pun_word = pun_word+"e"
+        return pun_word.title() + " 'er? I hardly KNOW 'er!"
     else:
         return
 
@@ -129,3 +139,5 @@ u'type': u'stream',
 u'id': 27441699,
 u'subject': u'i\u2019m a test'}
 """
+
+# for him: IH0 M // AH0 M

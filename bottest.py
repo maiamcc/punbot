@@ -3,9 +3,10 @@
 import zulip
 import sys
 import re
-from random import choice
+from random import choice, random
 import nltk
 
+PUN_CHANCE = 0.25 # probabiltiy of making a pun off a valid msg
 # defining all punctuation marks to be removed from msg strings
 punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;"
 
@@ -60,8 +61,6 @@ def hardly_know_er(text):
     for word in text:
         if valid_her_word(word):
             punable.append(word)
-    # TODO: add probability gen so it doesn't pun EVERY time, just some of the time
-    print punable
     if len(punable) > 0:
         pun_word = choice(punable)[:-2]
         if pun_word[-1] == "i": # e.g. ferrier --> ferry 'er
@@ -78,7 +77,9 @@ def hardly_know_er(text):
             if dictionary.get(pun_word+"e"):
                 print "lets modify the thing"
                 pun_word = pun_word+"e"
-        return pun_word.title() + " 'er? I hardly KNOW 'er!"
+        randnum = random()
+        if randnum <= PUN_CHANCE:
+            return pun_word.title() + " 'er? I hardly KNOW 'er!"
     else:
         return
 

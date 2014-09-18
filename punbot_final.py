@@ -6,7 +6,7 @@ import re
 import sys
 import zulip
 
-PUN_CHANCE = 0.25 # probabiltiy of making a pun off a valid msg
+PUN_CHANCE = 1 # probabiltiy of making a pun off a valid msg
 
 # defining all punctuation marks to be removed from msg strings
 punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;"
@@ -85,12 +85,11 @@ def hardly_know_er(text):
         if pun_word[-1] == "i": # e.g. ferrier --> ferry 'er
             if dictionary.get(pun_word[:-1]+"y"):
                 pun_word = pun_word[:-1]+"y"
+        elif dictionary.get(pun_word+"e"): # e.g. parser --> parse 'er
+            pun_word = pun_word+"e"
         elif not dictionary.get(pun_word): # e.g. stirrer --> stir 'er
             if dictionary.get(pun_word[:-1]):
                 pun_word = pun_word[:-1]
-        elif word[-2] == "e": # e.g. parser --> parse 'er
-            if dictionary.get(pun_word+"e"):
-                pun_word = pun_word+"e"
         randnum = random()
         # random chance of punning or not
         if randnum <= PUN_CHANCE:

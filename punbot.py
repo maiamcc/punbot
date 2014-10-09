@@ -82,8 +82,11 @@ def respond(msg):
                     send_response_msg(msg, "Aww, okay. :cry: Let me know if you ever want me back, with `@pun bot come back`. I'll just go away now.", definitely_respond=True)
                     banned_topics.append(msg["subject"])
             elif msg_lower == "come back":
-                send_response_msg(msg, "You want me back! Horray! I knew we were friends! :smile:")
-                banned_topics.remove(msg["subject"])
+                try:
+                    send_response_msg(msg, "You want me back! Horray! I knew we were friends! :smile:")
+                    banned_topics.remove(msg["subject"])
+                except ValueError:
+                    send_response_msg(msg, "I know, I'm pretty great. :smile: Don't worry, I'll never leave you!", definitely_respond=True)
             else:
                 pass
         elif msg["type"] == "private" and msg["content"] == "help":

@@ -9,7 +9,7 @@ A bot for Zulip that makes ridiculous puns.
 * `**@ pun bot** come back` - un-bans punbot from the current topic
 
 ### Fiddly bits
-Change `PUN_CHANCE` to any value between 0 and 1 to change the frequency with which pun bot puns (e.g. a value of `.3` means if presented with a punnable message, pun bot puns 30% of the time).
+Change `PUN_CHANCE` to any value between 0 and 1 to change the frequency with which pun bot puns (e.g. a value of `.3` means if presented with a punnable message, pun bot puns 30% of the time). Note that pun bot will always pun on anything sent to it via PM.
 
 ### I want my own pun bot!
 1. make a Zulip bot
@@ -17,9 +17,10 @@ Change `PUN_CHANCE` to any value between 0 and 1 to change the frequency with wh
     - from terminal, run `export punbot_api_key=[api key goes here]`
     - if using Heroku to host, you'll need to set this in the Heroku environment too: from terminal, run `heroku config:set punbot_api_key=[api key goes here]
     - consider putting a file (I called mine `environ`) in your project director and also in your .gitignore. It should contain only "export punbot_api_key=[api key goes here]". (Run `echo export punbot_api_key=[api key goes here] > environ`.) Then you can run `source environ` from terminal to automatically set that environment variable locally.
-3. adjust pun frequency if desired
-4. run the script on your machine or on Heroku
-5. ????
-6. Profit!
+3. subscribe it to any streams you want it to haunt (via your own `Subscriptions` page)
+4. adjust pun frequency if desired
+5. run the script on your machine or on Heroku
+6. ????
+7. Profit!
 
-(If anyone figures out what step 5 involves, please let me know.)
+(If anyone figures out what step 6 involves, please let me know.)

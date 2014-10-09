@@ -118,12 +118,14 @@ def hardly_know_er(text):
         if valid_her_word(word):
             punable.append(word)
     if len(punable) > 0:
-        pun_word = choice(punable)[:-2]
+        chosen_word = choice(punable)
+        pun_word = chosen_word[:-2]
         # manipulations to make valid words
         if pun_word[-1] == "i": # e.g. ferrier --> ferry 'er
             if dictionary.get(pun_word[:-1]+"y"):
                 pun_word = pun_word[:-1]+"y"
-        elif dictionary.get(pun_word+"e"): # e.g. parser --> parse 'er
+        elif dictionary.get(pun_word+"e") and chosen_word[-2] == "e":
+            # e.g. parser --> parse 'er (but NOT vicar --> vice 'er)
             pun_word = pun_word+"e"
         elif not dictionary.get(pun_word): # e.g. stirrer --> stir 'er
             if dictionary.get(pun_word[:-1]):

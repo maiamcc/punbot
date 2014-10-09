@@ -31,7 +31,7 @@ client = zulip.Client(email="punbot-bot@students.hackerschool.com",
                       api_key=os.environ["punbot_api_key"])
 
 # pronunciation dictionary
-dictionary = nltk.corpus.cmudict.dict()
+dictionary = nltk.cmudict.dict()
 
 def get_word_stress(word):
     """Returns a list of 0s and 1s indicating the stress

@@ -19,6 +19,9 @@ Contact Maia McCormick (Summer 2 2014) with any questions or problems, or [check
 # defining all punctuation marks to be removed from msg strings
 punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;"
 
+# list of topics in which punbot should not post
+banned_topics = []
+
 # initializing a Zulip client
 client = zulip.Client(email="punbot-bot@students.hackerschool.com",
                       api_key="FgrSqwnEu0MM3XyEpdwcpeINkC95cyw4")
@@ -62,27 +65,33 @@ def valid_her_word(word):
 def respond(msg):
     """Processes incoming messages and, if appropriate,
         sends response."""
+    print msg
     if msg["sender_email"] != "punbot-bot@students.hackerschool.com":
         if msg["content"].startswith("@**pun bot**"):
             msg_lower = msg["content"].lower()
             msg_lower = msg_lower.replace("@**pun bot** ", "")
-            print msg_lower
             if msg_lower == "help":
                 send_response_msg(msg, HELP_MSG, definitely_respond=True)
             elif msg_lower == "shut up" or msg_lower == "go away":
-                send_response_msg(msg, "you don't like me =(")
+                if msg["subject"] in banned_topics:
+                    send_response_msg(msg, "Yeesh, what do you want from me? You've already banned me!", definitely_respond=True)
+                else:
+                    send_response_msg(msg, "Aww, okay. :cry: Let me know if you ever want me back, with `@pun bot come back`. I'll just go away now.", definitely_respond=True)
+                    banned_topics.append(msg["subject"])
             elif msg_lower == "come back":
-                send_response_msg(msg, "you want me back!")
+                send_response_msg(msg, "You want me back! Horray! I knew we were friends! :smile:")
+                banned_topics.remove(msg["subject"])
             else:
                 pass
         elif msg["type"] == "private" and msg["content"] == "help":
             send_response_msg(msg, HELP_MSG, definitely_respond=True)
-        msg_content = str(msg["content"]).translate(None, punctuation).lower().split()
+        elif msg["subject"] not in banned_topics:
+            msg_content = str(msg["content"]).translate(None, punctuation).lower().split()
 
-        pun_msg = hardly_know_er(msg_content)
+            pun_msg = hardly_know_er(msg_content)
 
-        if pun_msg:
-            send_response_msg(msg, pun_msg)
+            if pun_msg:
+                send_response_msg(msg, pun_msg)
 
 def send_response_msg(incoming_msg, outgoing_text, probability=PUN_CHANCE, definitely_respond=False):
     randnum = random() # random chance of punning or not

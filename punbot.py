@@ -6,7 +6,7 @@ import re
 import sys
 import zulip
 
-PUN_CHANCE = 1 # probabiltiy of making a pun off a valid msg
+PUN_CHANCE = 1 # number between 0 and 1 -- probabiltiy of making a pun off a valid msg
 
 # defining all punctuation marks to be removed from msg strings
 punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;"
@@ -56,22 +56,29 @@ def respond(msg):
         sends response."""
     if msg["sender_email"] != "punbot-bot@students.hackerschool.com":
         msg_content = str(msg["content"]).translate(None, punctuation).lower().split()
-        pun_msg = hardly_know_er(msg_content)
-        if pun_msg:
-            if msg["type"] == "private":
-                client.send_message({
-                    "type": "private",
-                    "to": msg["sender_email"],
-                    "content": pun_msg
-                })
-            elif msg["type"] == "stream":
-                client.send_message({
-                    "type": "stream",
-                    "subject": msg["subject"],
-                    "to": msg['display_recipient'],
-                    "content": pun_msg
-                })
 
+        pun_msg = hardly_know_er(msg_content)
+
+        if pun_msg:
+            send_response_msg(msg, pun_msg)
+
+def send_response_msg(incoming_msg, outgoing_text, probability=PUN_CHANCE, definitely_respond=False):
+    randnum = random() # random chance of punning or not
+    if definitely_respond:
+        probability = 1
+    if incoming_msg["type"] == "private":
+        client.send_message({
+            "type": "private",
+            "to": incoming_msg["sender_email"],
+            "content": outgoing_text
+        })
+    elif incoming_msg["type"] == "stream" and randnum <= probability:
+        client.send_message({
+            "type": "stream",
+            "subject": incoming_msg["subject"],
+            "to": incoming_msg['display_recipient'],
+            "content": outgoing_text
+        })
 def hardly_know_er(text):
     """Checks text for punnable words, picks one at random
         and returns a pun statement for that word."""
@@ -90,10 +97,7 @@ def hardly_know_er(text):
         elif not dictionary.get(pun_word): # e.g. stirrer --> stir 'er
             if dictionary.get(pun_word[:-1]):
                 pun_word = pun_word[:-1]
-        randnum = random()
-        # random chance of punning or not
-        if randnum <= PUN_CHANCE:
-            return adjust_case(pun_word) + " 'er? I hardly KNOW 'er!"
+        return adjust_case(pun_word) + " 'er? I hardly KNOW 'er!"
     else:
         return
 

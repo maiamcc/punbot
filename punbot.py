@@ -2,6 +2,7 @@
 
 import nltk
 from random import choice, random
+import os
 import re
 import sys
 import zulip
@@ -23,8 +24,9 @@ punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;"
 banned_topics = []
 
 # initializing a Zulip client
+# if running from my machine, in terminal, `source environ` to set environmental var
 client = zulip.Client(email="punbot-bot@students.hackerschool.com",
-                      api_key="FgrSqwnEu0MM3XyEpdwcpeINkC95cyw4")
+                      api_key=os.environ["punbot_api_key"])
 
 # pronunciation dictionary
 dictionary = nltk.corpus.cmudict.dict()
@@ -110,6 +112,7 @@ def send_response_msg(incoming_msg, outgoing_text, probability=PUN_CHANCE, defin
             "to": incoming_msg['display_recipient'],
             "content": outgoing_text
         })
+
 def hardly_know_er(text):
     """Checks text for punnable words, picks one at random
         and returns a pun statement for that word."""

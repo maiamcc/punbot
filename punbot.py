@@ -67,7 +67,6 @@ def valid_her_word(word):
 def respond(msg):
     """Processes incoming messages and, if appropriate,
         sends response."""
-    print msg
     if msg["sender_email"] != "punbot-bot@students.hackerschool.com":
         if msg["content"].startswith("@**pun bot**"):
             msg_lower = msg["content"].lower()

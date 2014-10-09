@@ -7,6 +7,14 @@ import sys
 import zulip
 
 PUN_CHANCE = 1 # number between 0 and 1 -- probabiltiy of making a pun off a valid msg
+HELP_MSG = """Hi, I'm punbot, here for all of your annoying pun needs! (Well, actually, only a single, very specifiy annoying pun need. Sorry about that.) Here's how I work:\n\n
+
+- if you post in a stream I'm subscribed to (`social`, `off-topic`, `Victory`, `Oops`), I miiiight make a stupid pun.\n
+- PM me "help" or write "@pun bot help" in a stream I'm subcribed to for help\n
+- if you want me to stop bothering you in a specific topic, write "@pun bot go away" or "@pun bot shut up" and I'll leave that topic FOREVER! :cry:\n
+- but if you miss me, you can write "@pun bot come back" and it will be like I never left!\n
+
+Contact Maia McCormick (Summer 2 2014) with any questions or problems, or [check out my code](github.com/maiamcc/punbot)."""
 
 # defining all punctuation marks to be removed from msg strings
 punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;"
@@ -55,6 +63,20 @@ def respond(msg):
     """Processes incoming messages and, if appropriate,
         sends response."""
     if msg["sender_email"] != "punbot-bot@students.hackerschool.com":
+        if msg["content"].startswith("@**pun bot**"):
+            msg_lower = msg["content"].lower()
+            msg_lower = msg_lower.replace("@**pun bot** ", "")
+            print msg_lower
+            if msg_lower == "help":
+                send_response_msg(msg, HELP_MSG, definitely_respond=True)
+            elif msg_lower == "shut up" or msg_lower == "go away":
+                send_response_msg(msg, "you don't like me =(")
+            elif msg_lower == "come back":
+                send_response_msg(msg, "you want me back!")
+            else:
+                pass
+        elif msg["type"] == "private" and msg["content"] == "help":
+            send_response_msg(msg, HELP_MSG, definitely_respond=True)
         msg_content = str(msg["content"]).translate(None, punctuation).lower().split()
 
         pun_msg = hardly_know_er(msg_content)

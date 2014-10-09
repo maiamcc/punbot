@@ -93,9 +93,16 @@ def hardly_know_er(text):
         randnum = random()
         # random chance of punning or not
         if randnum <= PUN_CHANCE:
-            return pun_word.title() + " 'er? I hardly KNOW 'er!"
+            return adjust_case(pun_word) + " 'er? I hardly KNOW 'er!"
     else:
         return
+
+def adjust_case(word):
+    """Title cases the word, unless it starts with ':' (i.e. it's an emoji)."""
+    if word.startswith(":"):
+        return word
+    else:
+        return word.title()
 
 # Parse each message that the user receives
 # This is a blocking call that will run forever

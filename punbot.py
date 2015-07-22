@@ -23,7 +23,7 @@ Contact Maia McCormick (Summer 2 2014) with any questions or problems, or [check
 punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;"
 
 # list of topics in which punbot should not post
-banned_topics = []
+topics_whitelist = []
 
 # initializing a Zulip client
 # if running from my machine, in terminal, `source environ` to set environmental var
@@ -80,18 +80,21 @@ def respond(msg):
                     send_response_msg(msg, "Yeesh, what do you want from me? You've already banned me!", definitely_respond=True)
                 else:
                     send_response_msg(msg, "Aww, okay. :cry: Let me know if you ever want me back, with `@pun bot come back`. I'll just go away now.", definitely_respond=True)
-                    banned_topics.append(msg["subject"])
+                    topics_whitelist.remove(msg["subject"])
             elif msg_lower == "come back":
                 try:
                     send_response_msg(msg, "You want me back! Horray! I knew we were friends! :smile:")
-                    banned_topics.remove(msg["subject"])
+                    topics_whitelist.append(msg["subject"])
                 except ValueError:
                     send_response_msg(msg, "I know, I'm pretty great. :smile: Don't worry, I'll never leave you!", definitely_respond=True)
+            elif msg["subject"] not in topics_whitelist:
+                send_response_msg(msg, "Ohai! I'm paying attention now! :smile:", definitely_respond=True)
+                topics_whitelist.append(msg["subject"])
             else:
                 pass
         elif msg["type"] == "private" and msg["content"] == "help":
             send_response_msg(msg, HELP_MSG, definitely_respond=True)
-        elif msg["subject"] not in banned_topics:
+        elif msg["subject"] in topics_whitelist:
             msg_content = str(msg["content"]).translate(None, punctuation).lower().split()
 
             pun_msg = hardly_know_er(msg_content)

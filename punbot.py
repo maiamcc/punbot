@@ -153,7 +153,6 @@ def adjust_case(word):
 
 # Parse each message that the user receives
 # This is a blocking call that will run forever
-# PUNBOT TEMPORARILY DISABLED WHILE IT RETHINKS ITS PURPOSE IN LIFE
-# client.call_on_each_message(respond)
+client.call_on_each_message(respond)
 
 # for him: IH0 M // AH0 M

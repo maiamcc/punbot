@@ -9,7 +9,7 @@ import zulip
 
 nltk.data.path.append('./nltk_data/')
 
-PUN_CHANCE = 0.20 # number between 0 and 1 -- probabiltiy of making a pun off a valid msg
+PUN_CHANCE = 0.75 # number between 0 and 1 -- probabiltiy of making a pun off a valid msg
 HELP_MSG = """Hi, I'm punbot, here for all of your annoying pun needs! (Well, actually, only a single, very specifiy annoying pun need. Sorry about that.) Here's how I work:\n\n
 
 - if you post in a stream I'm subscribed to (`social`, `off-topic`, `Victory`, `Oops`), I miiiight make a stupid pun.\n

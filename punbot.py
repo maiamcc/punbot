@@ -132,7 +132,7 @@ def respond(msg):
             pass
 
         if response:
-            send_response_msg(msg, "test: " + response, response_chance)
+            send_response_msg(msg, response, response_chance)
 
 def send_response_msg(incoming_msg, outgoing_text, probability):
     randnum = random() # random chance of punning or not

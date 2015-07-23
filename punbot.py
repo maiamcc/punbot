@@ -75,7 +75,7 @@ def respond(msg):
             msg_lower = msg_lower.replace("@**pun bot** ", "")
             if msg_lower == "help":
                 send_response_msg(msg, HELP_MSG, definitely_respond=True)
-            elif msg_lower == "shut up" or msg_lower == "go away":
+            elif msg_lower in ["shut up", "go away", "shush", "hush", "shoo"]:
                 if msg["subject"] in banned_topics:
                     send_response_msg(msg, "Yeesh, what do you want from me? You've already banned me!", definitely_respond=True)
                 else:
@@ -83,10 +83,20 @@ def respond(msg):
                     topics_whitelist.remove(msg["subject"])
             elif msg_lower == "come back":
                 try:
-                    send_response_msg(msg, "You want me back! Horray! I knew we were friends! :smile:")
+                    send_response_msg(msg, "You want me back! Hooray! I knew we were friends! :smile:")
                     topics_whitelist.append(msg["subject"])
                 except ValueError:
                     send_response_msg(msg, "I know, I'm pretty great. :smile: Don't worry, I'll never leave you!", definitely_respond=True)
+            elif msg_lower in ["more", "more pun", "more puns"]:
+                send_response_msg(msg, "So much pun!", definitely_respond=True)
+                PUN_CHANCE += 0.25
+                if PUN_CHANCE > 1:
+                    PUN_CHANCE = 1.0
+            elif msg_lower in ["less", "less pun", "less puns", "fewer", "fewer pun", "fewer puns"]:
+                send_response_msg(msg, "Not so punny, eh?", definitely_respond=True)
+                PUN_CHANCE -= 0.25
+                if PUN_CHANCE < 0:
+                    PUN_CHANCE = 0
             elif msg["subject"] not in topics_whitelist:
                 send_response_msg(msg, "Ohai! I'm paying attention now! :smile:", definitely_respond=True)
                 topics_whitelist.append(msg["subject"])

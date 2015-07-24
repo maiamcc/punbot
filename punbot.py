@@ -9,15 +9,15 @@ import zulip
 
 nltk.data.path.append('./nltk_data/')
 
-PUN_CHANCE = 0.75  # number between 0 and 1 -- probability of making a pun off a valid msg
+PUN_CHANCE = 0.50  # number between 0 and 1 -- probability of making a pun off a valid msg
 
 HELP_MSG = """Hi, I'm punbot, here for all of your annoying pun needs! (Well, actually, only a single, very specifiy annoying pun need. Sorry about that.) Here's how I work:\n\n
 
 - if you post in a stream I'm subscribed to (`social`, `off-topic`, `Victory`, `Oops`), I miiiight make a stupid pun.\n
-- PM me "help" or write "@pun bot help" for help\n
-- if you want me to stop bothering you in a specific topic, write "@pun bot go away" or "@pun bot shut up" and I'll leave that topic FOREVER! :cry:\n
-- but if you miss me, you can write "@pun bot come back" and it will be like I never left!\n
-- if you need more puns, write "@pun bot more pun" (or less with "@pun bot less pun")\n
+- PM me `help` or write `@pun bot help` for help\n
+- if you want me to stop bothering you in a specific topic, write `@pun bot go away` or `@pun bot shut up` and I'll leave that topic FOREVER! :cry:\n
+- but if you miss me, you can write `@pun bot come back` and it will be like I never left!\n
+- if you need more puns, write `@pun bot more pun` (or less with `@pun bot less pun`)\n
 
 Contact Maia McCormick (Summer 2 2014) with any questions or problems, or [check out my code](github.com/maiamcc/punbot)."""
 
@@ -118,7 +118,8 @@ def respond(msg):
                     response = "Not so punny, eh? (pun chance = %d%%)" \
                                % (pun_chance * 100)
                 else:
-                    pass
+                    response = "Eh? What's that? Speak up, I've got a banana \
+                    in my ear. :banana: (Need help? Try `@pun bot help`.)"
             else:
                 response = "Ohai! I'm paying attention now! :smile:"
                 topics_whitelist.setdefault(msg_topic, PUN_CHANCE)

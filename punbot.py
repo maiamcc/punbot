@@ -9,21 +9,26 @@ import zulip
 
 nltk.data.path.append('./nltk_data/')
 
-PUN_CHANCE = 0.75 # number between 0 and 1 -- probabiltiy of making a pun off a valid msg
+PUN_CHANCE = 0.75  # number between 0 and 1 -- probability of making a pun off a valid msg
+
 HELP_MSG = """Hi, I'm punbot, here for all of your annoying pun needs! (Well, actually, only a single, very specifiy annoying pun need. Sorry about that.) Here's how I work:\n\n
 
 - if you post in a stream I'm subscribed to (`social`, `off-topic`, `Victory`, `Oops`), I miiiight make a stupid pun.\n
-- PM me "help" or write "@pun bot help" in a stream I'm subcribed to for help\n
+- PM me "help" or write "@pun bot help" for help\n
 - if you want me to stop bothering you in a specific topic, write "@pun bot go away" or "@pun bot shut up" and I'll leave that topic FOREVER! :cry:\n
 - but if you miss me, you can write "@pun bot come back" and it will be like I never left!\n
+- if you need more puns, write "@pun bot more pun" (or less with "@pun bot less pun")\n
 
 Contact Maia McCormick (Summer 2 2014) with any questions or problems, or [check out my code](github.com/maiamcc/punbot)."""
 
 # defining all punctuation marks to be removed from msg strings
 punctuation =  ".,?![]{}()'\"!@#$%^&*<>/-_+=;"
 
-# list of topics in which punbot should not post
-topics_whitelist = []
+# list of topics in which punbot may post with pun_chance
+topics_whitelist = {}
+
+# list of topics where punbot is banned
+banned_topics = []
 
 # initializing a Zulip client
 # if running from my machine, in terminal, `source environ` to set environmental var
@@ -67,45 +72,71 @@ def valid_her_word(word):
         return True
 
 def respond(msg):
-    """Processes incoming messages and, if appropriate,
-        sends response."""
+    """Processes incoming messages and, if appropriate,sends response."""
     if msg["sender_email"] != "punbot-bot@students.hackerschool.com":
+        response = None
+        response_chance = 1.0  # defaults that a response will 100% happen
         if msg["content"].startswith("@**pun bot**"):
-            msg_lower = msg["content"].lower()
+            msg_lower = msg["content"].lower().strip()
             msg_lower = msg_lower.replace("@**pun bot** ", "")
+            msg_topic = msg["subject"]
+
             if msg_lower == "help":
-                send_response_msg(msg, HELP_MSG, definitely_respond=True)
-            elif msg_lower == "shut up" or msg_lower == "go away":
-                if msg["subject"] in banned_topics:
-                    send_response_msg(msg, "Yeesh, what do you want from me? You've already banned me!", definitely_respond=True)
+                response = HELP_MSG
+            elif msg_topic in banned_topics:
+                if msg_lower in ["shut up", "go away",
+                                 "shush", "hush", "shoo"]:
+                    response = "Yeesh, what do you want from me? \
+                                You've already banned me!"
+                elif msg_lower == "come back":
+                    response = "You want me back! Hooray! \
+                                I knew we were friends! :smile:"
+                    topics_whitelist.setdefault(msg_topic, PUN_CHANCE)
+                    banned_topics.remove(msg_topic)
                 else:
-                    send_response_msg(msg, "Aww, okay. :cry: Let me know if you ever want me back, with `@pun bot come back`. I'll just go away now.", definitely_respond=True)
-                    topics_whitelist.remove(msg["subject"])
-            elif msg_lower == "come back":
-                try:
-                    send_response_msg(msg, "You want me back! Horray! I knew we were friends! :smile:")
-                    topics_whitelist.append(msg["subject"])
-                except ValueError:
-                    send_response_msg(msg, "I know, I'm pretty great. :smile: Don't worry, I'll never leave you!", definitely_respond=True)
-            elif msg["subject"] not in topics_whitelist:
-                send_response_msg(msg, "Ohai! I'm paying attention now! :smile:", definitely_respond=True)
-                topics_whitelist.append(msg["subject"])
+                    pass
+            elif msg_lower in ["shut up", "go away", "shush", "hush", "shoo"]:
+                response = "Aww, okay. :cry: \
+                            Let me know if you ever want me back, \
+                            with `@pun bot come back`. \
+                            I'll just go away now."
+                banned_topics.append(msg_topic)
+                if msg_topic in topics_whitelist:
+                    topics_whitelist.pop(msg_topic)
+            elif msg_topic in topics_whitelist:
+                if msg_lower in ["more", "more pun", "more puns"]:
+                    pun_chance = topics_whitelist[msg_topic]
+                    pun_chance = min(1.0, pun_chance + 0.1)
+                    topics_whitelist[msg_topic] = pun_chance
+                    response = "So much pun! (pun chance = %d%%)" \
+                               % (pun_chance * 100)
+                elif msg_lower in ["less", "less pun", "less puns",
+                                   "fewer", "fewer pun", "fewer puns"]:
+                    pun_chance = topics_whitelist[msg_topic]
+                    pun_chance = max(0.0, pun_chance - 0.1)
+                    topics_whitelist[msg_topic] = pun_chance
+                    response = "Not so punny, eh? (pun chance = %d%%)" \
+                               % (pun_chance * 100)
+                else:
+                    pass
             else:
-                pass
+                response = "Ohai! I'm paying attention now! :smile:"
+                topics_whitelist.setdefault(msg_topic, PUN_CHANCE)
         elif msg["type"] == "private" and msg["content"] == "help":
-            send_response_msg(msg, HELP_MSG, definitely_respond=True)
+            response = HELP_MSG
         elif msg["subject"] in topics_whitelist:
             msg_content = str(msg["content"]).translate(None, punctuation).lower().split()
 
-            pun_msg = hardly_know_er(msg_content)
+            response = hardly_know_er(msg_content)
+            response_chance = topics_whitelist[msg["subject"]]
+        else:
+            pass
 
-            if pun_msg:
-                send_response_msg(msg, pun_msg)
+        if response:
+            send_response_msg(msg, response, response_chance)
 
-def send_response_msg(incoming_msg, outgoing_text, probability=PUN_CHANCE, definitely_respond=False):
+def send_response_msg(incoming_msg, outgoing_text, probability):
     randnum = random() # random chance of punning or not
-    if definitely_respond:
-        probability = 1
     if incoming_msg["type"] == "private":
         client.send_message({
             "type": "private",

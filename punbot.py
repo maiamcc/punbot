@@ -119,7 +119,7 @@ def respond(msg):
                     response = "Not so punny, eh? (pun chance = %d%%)" \
                                % (pun_chance * 100)
                 elif msg_lower in ["pun me", "say something", "reaction"]:
-                    send_response_msg(msg, choice(PUNME_LIST), definitely_respond=True)
+                    response = choice(PUNME_LIST)
                 else:
                     response = "Eh? What's that? Speak up, I've got a banana \
                     in my ear. :banana: (Need help? Try `@pun bot help`.)"

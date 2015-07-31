@@ -9,6 +9,7 @@ A bot for Zulip that makes ridiculous puns.
 * `**@ pun bot** come back` - un-bans punbot from the current topic
 * `**@ pun bot** more pun` - increases pun frequency
 * `**@ pun bot** less pun` - decreases pun frequency
+* `**@ pun bot** pun me` - returns a pun
 
 ### Fiddly bits
 Change `PUN_CHANCE` to any value between 0 and 1 to change the frequency with which pun bot puns (e.g. a value of `.3` means if presented with a punnable message, pun bot puns 30% of the time). Note that pun bot will always pun on anything sent to it via PM.

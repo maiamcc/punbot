@@ -6,10 +6,11 @@ import os
 import re
 import sys
 import zulip
+from punme import PUNME_LIST
 
 nltk.data.path.append('./nltk_data/')
 
-PUN_CHANCE = 0.50  # number between 0 and 1 -- probability of making a pun off a valid msg
+DEFAULT_PUN_CHANCE = 0.50  # number between 0 and 1 -- probability of making a pun off a valid msg
 
 HELP_MSG = """Hi, I'm punbot, here for all of your annoying pun needs! (Well, actually, only a single, very specifiy annoying pun need. Sorry about that.) Here's how I work:\n\n
 
@@ -91,7 +92,7 @@ def respond(msg):
                 elif msg_lower == "come back":
                     response = "You want me back! Hooray! \
                                 I knew we were friends! :smile:"
-                    topics_whitelist.setdefault(msg_topic, PUN_CHANCE)
+                    topics_whitelist.setdefault(msg_topic, DEFAULT_PUN_CHANCE)
                     banned_topics.remove(msg_topic)
                 else:
                     pass
@@ -117,12 +118,14 @@ def respond(msg):
                     topics_whitelist[msg_topic] = pun_chance
                     response = "Not so punny, eh? (pun chance = %d%%)" \
                                % (pun_chance * 100)
+                elif msg_lower in ["pun me", "say something", "reaction"]:
+                    send_response_msg(msg, choice(PUNME_LIST), definitely_respond=True)
                 else:
                     response = "Eh? What's that? Speak up, I've got a banana \
                     in my ear. :banana: (Need help? Try `@pun bot help`.)"
             else:
                 response = "Ohai! I'm paying attention now! :smile:"
-                topics_whitelist.setdefault(msg_topic, PUN_CHANCE)
+                topics_whitelist.setdefault(msg_topic, DEFAULT_PUN_CHANCE)
         elif msg["type"] == "private" and msg["content"] == "help":
             response = HELP_MSG
         elif msg["subject"] in topics_whitelist:

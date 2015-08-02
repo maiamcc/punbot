@@ -77,7 +77,7 @@ def respond(msg):
     if msg["sender_email"] != "punbot-bot@students.hackerschool.com":
         response = None
         response_chance = 1.0  # defaults that a response will 100% happen
-        if msg["content"].startswith("@**pun bot**"):
+        if "@**pun bot**" in msg["content"]:
             msg_lower = msg["content"].lower().strip()
             msg_lower = msg_lower.replace("@**pun bot** ", "")
             msg_topic = msg["subject"]

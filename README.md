@@ -30,8 +30,10 @@ Change `PUN_CHANCE` to any value between 0 and 1 to change the frequency with wh
 
 ### Punbot in Action
 Good old-fashioned punning:
+
 ![Screenshot 0](/Screenshots/driver.png)
 
 Punbot crashing someone else's blog test, and `**@ pun bot** go away` in action:
+
 ![Screenshot 1](/Screenshots/weather0.png)
 ![Screenshot 2](/Screenshots/weather1.png)
